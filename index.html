@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Oliviera — AI Automation Platform</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+
+:root{
+    --bg:#050607;
+    --bg2:#080a0b;
+    --panel:#111415;
+    --panel2:#17191a;
+    --line:rgba(255,255,255,.12);
+    --line2:rgba(255,255,255,.07);
+    --white:#f4f4f1;
+    --muted:#858887;
+    --soft:#b4b7b5;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:Inter,Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+button{
+    font:inherit;
+}
+
+/* =========================
+   LOADER
+========================= */
+
+.loader{
+    position:fixed;
+    inset:0;
+    background:#050607;
+    z-index:9999;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    transition:opacity .8s ease,visibility .8s ease;
+}
+
+.loader.hide{
+    opacity:0;
+    visibility:hidden;
+}
+
+.loader-logo{
+    width:90px;
+    height:90px;
+    position:relative;
+    animation:loaderSpin 4s linear infinite;
+}
+
+.loader-logo span{
+    position:absolute;
+    width:28px;
+    height:28px;
+    background:#e9e9e5;
+    border-radius:7px;
+}
+
+.loader-logo span:nth-child(1){
+    left:31px;
+    top:0;
+    transform:rotate(25deg);
+}
+
+.loader-logo span:nth-child(2){
+    right:3px;
+    top:20px;
+    transform:rotate(65deg);
+}
+
+.loader-logo span:nth-child(3){
+    right:4px;
+    bottom:15px;
+    transform:rotate(110deg);
+}
+
+.loader-logo span:nth-child(4){
+    left:30px;
+    bottom:0;
+    transform:rotate(155deg);
+}
+
+.loader-logo span:nth-child(5){
+    left:3px;
+    bottom:17px;
+    transform:rotate(205deg);
+}
+
+.loader-logo span:nth-child(6){
+    left:3px;
+    top:20px;
+    transform:rotate(250deg);
+}
+
+@keyframes loaderSpin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.grid-bg{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.12;
+    background-image:
+        linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
+    background-size:80px 80px;
+    mask-image:linear-gradient(to bottom,black,transparent 75%);
+    z-index:-2;
+}
+
+.noise{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.035;
+    z-index:100;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.nav-wrap{
+    position:fixed;
+    top:22px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(720px,calc(100% - 30px));
+    z-index:500;
+}
+
+.nav{
+    height:58px;
+    padding:7px 8px 7px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(86,90,91,.58);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-radius:100px;
+    box-shadow:0 15px 50px rgba(0,0,0,.35);
+}
+
+.brand{
+    width:32px;
+    height:32px;
+    display:grid;
+    place-items:center;
+}
+
+.brand-icon{
+    width:27px;
+    height:27px;
+    position:relative;
+    transform:rotate(30deg);
+}
+
+.brand-icon i{
+    position:absolute;
+    width:10px;
+    height:10px;
+    border-radius:3px;
+    background:#f4f4f1;
+}
+
+.brand-icon i:nth-child(1){left:8px;top:0}
+.brand-icon i:nth-child(2){right:0;top:6px}
+.brand-icon i:nth-child(3){right:0;bottom:4px}
+.brand-icon i:nth-child(4){left:8px;bottom:0}
+.brand-icon i:nth-child(5){left:0;bottom:5px}
+.brand-icon i:nth-child(6){left:0;top:6px}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    gap:24px;
+    margin-left:auto;
+}
+
+.nav-links a{
+    font-size:12px;
+    color:#e3e4e2;
+    white-space:nowrap;
+    transition:.25s ease;
+}
+
+.nav-links a:hover{
+    color:white;
+}
+
+.demo-btn{
+    border:0;
+    background:#f3f3ef;
+    color:#171818;
+    border-radius:100px;
+    padding:12px 19px;
+    font-weight:600;
+    font-size:12px;
+    margin-left:20px;
+    cursor:pointer;
+    transition:.3s ease;
+}
+
+.demo-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 25px rgba(255,255,255,.15);
+}
+
+.menu{
+    display:none;
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.06);
+    color:white;
+    border-radius:50%;
+    cursor:pointer;
+}
+
+/* =========================
+   GENERAL
+========================= */
+
+section{
+    position:relative;
+}
+
+.container{
+    width:min(1160px,calc(100% - 40px));
+    margin:auto;
+}
+
+.eyebrow{
+    font-family:"DM Mono",monospace;
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:.05em;
+    color:#d0d1ce;
+}
+
+.section-title{
+    font-size:clamp(42px,6vw,82px);
+    font-weight:400;
+    letter-spacing:-.055em;
+    line-height:.98;
+}
+
+.small-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:11px 16px;
+    border:1px solid rgba(255,255,255,.28);
+    color:#ddd;
+    font-family:"DM Mono",monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    position:relative;
+    transition:.3s ease;
+}
+
+.small-btn:before,
+.small-btn:after{
+    content:"";
+    position:absolute;
+    width:8px;
+    height:8px;
+    transition:.3s ease;
+}
+
+.small-btn:before{
+    left:-1px;
+    top:-1px;
+    border-left:1px solid white;
+    border-top:1px solid white;
+}
+
+.small-btn:after{
+    right:-1px;
+    bottom:-1px;
+    border-right:1px solid white;
+    border-bottom:1px solid white;
+}
+
+.small-btn:hover{
+    background:#eee;
+    color:#111;
+}
+
+.reveal{
+    opacity:0;
+    transform:translateY(50px);
+    transition:
+        opacity 1s cubic-bezier(.16,1,.3,1),
+        transform 1s cubic-bezier(.16,1,.3,1);
+}
+
+.reveal.visible{
+    opacity:1;
+    transform:none;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    padding:130px 0 80px;
+}
+
+.hero:before{
+    content:"";
+    position:absolute;
+    width:700px;
+    height:700px;
+    left:50%;
+    top:30%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,rgba(255,255,255,.09),transparent 62%);
+    filter:blur(30px);
+    pointer-events:none;
+}
+
+.hero-inner{
+    width:min(1050px,calc(100% - 40px));
+    margin:auto;
+    text-align:center;
+}
+
+.hero-logo{
+    width:175px;
+    height:175px;
+    margin:0 auto 70px;
+    position:relative;
+    animation:heroFloat 5s ease-in-out infinite;
+}
+
+.hero-logo .shape{
+    position:absolute;
+    width:68px;
+    height:68px;
+    border-radius:14px;
+    background:linear-gradient(145deg,#393b3b,#111313);
+    box-shadow:
+        inset 1px 1px 1px rgba(255,255,255,.08),
+        10px 15px 20px rgba(0,0,0,.45);
+}
+
+.hero-logo .dot{
+    position:absolute;
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    background:#111;
+    box-shadow:inset 1px 1px 2px rgba(255,255,255,.08);
+}
+
+.s1{left:55px;top:0;transform:rotate(30deg)}
+.s2{right:5px;top:30px;transform:rotate(70deg)}
+.s3{right:5px;bottom:25px;transform:rotate(110deg)}
+.s4{left:55px;bottom:0;transform:rotate(155deg)}
+.s5{left:5px;bottom:27px;transform:rotate(205deg)}
+.s6{left:5px;top:30px;transform:rotate(250deg)}
+
+.d1{left:65px;top:-5px}
+.d2{right:-5px;top:47px}
+.d3{right:0;bottom:23px}
+.d4{left:64px;bottom:-8px}
+.d5{left:-8px;bottom:30px}
+.d6{left:-8px;top:48px}
+
+@keyframes heroFloat{
+    0%,100%{transform:translateY(0) rotate(0deg)}
+    50%{transform:translateY(-10px) rotate(2deg)}
+}
+
+.hero h1{
+    max-width:850px;
+    margin:18px auto 30px;
+    font-size:clamp(45px,7vw,92px);
+    font-weight:300;
+    letter-spacing:-.065em;
+    line-height:.95;
+}
+
+.hero-actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.hero-actions .primary{
+    background:#f1f1ed;
+    color:#171818;
+    border-color:#f1f1ed;
+}
+
+.hero-actions .primary:hover{
+    background:white;
+}
+
+/* =========================
+   OLD WAY
+========================= */
+
+.old-way{
+    min-height:125vh;
+    padding:180px 0 130px;
+}
+
+.old-header{
+    text-align:center;
+    max-width:800px;
+    margin:0 auto 100px;
+}
+
+.old-header h2{
+    margin-top:24px;
+    font-size:clamp(45px,6vw,78px);
+    font-weight:300;
+    letter-spacing:-.06em;
+    line-height:.98;
+}
+
+.old-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:100px;
+    align-items:center;
+}
+
+.problems{
+    display:flex;
+    flex-direction:column;
+}
+
+.problem{
+    min-height:105px;
+    padding:27px 30px;
+    border-top:1px solid var(--line2);
+    position:relative;
+    transition:.5s ease;
+    cursor:pointer;
+}
+
+.problem:last-child{
+    border-bottom:1px solid var(--line2);
+}
+
+.problem.active{
+    background:linear-gradient(90deg,rgba(255,255,255,.08),transparent);
+    border:1px solid rgba(175,200,255,.35);
+    box-shadow:0 0 35px rgba(100,130,170,.07);
+}
+
+.problem-number{
+    font-family:"DM Mono",monospace;
+    font-size:11px;
+    color:#777;
+    margin-bottom:8px;
+}
+
+.problem h3{
+    font-size:14px;
+    font-weight:400;
+    margin-bottom:8px;
+}
+
+.problem p{
+    color:#717574;
+    font-family:"DM Mono",monospace;
+    font-size:10px;
+    line-height:1.5;
+}
+
+.system{
+    height:430px;
+    display:grid;
+    place-items:center;
+    position:relative;
+}
+
+.system:before{
+    content:"";
+    position:absolute;
+    width:300px;
+    height:300px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:50%;
+    animation:systemSpin 20s linear infinite;
+}
+
+.system:after{
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    border:1px dashed rgba(255,255,255,.09);
+    border-radius:50%;
+}
+
+@keyframes systemSpin{
+    to{transform:rotate(360deg)}
+}
+
+.system-core{
+    width:105px;
+    height:105px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#696b6a,#222526 60%,#0c0d0e);
+    box-shadow:
+        0 0 70px rgba(255,255,255,.08),
+        inset 0 0 20px rgba(255,255,255,.12);
+    display:grid;
+    place-items:center;
+    z-index:3;
+}
+
+.core-dot{
+    width:25px;
+    height:25px;
+    border-radius:50%;
+    border:1px dotted #aaa;
+    animation:coreSpin 5s linear infinite;
+}
+
+@keyframes coreSpin{
+    to{transform:rotate(360deg)}
+}
+
+.node{
+    position:absolute;
+    width:62px;
+    height:62px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;
+    display:grid;
+    place-items:center;
+    background:rgba(30,32,33,.8);
+    backdrop-filter:blur(10px);
+}
+
+.node:after{
+    content:"";
+    width:17px;
+    height:17px;
+    border-radius:5px;
+    background:#aaa;
+}
+
+.node-left{left:6%;top:45%}
+.node-right{right:6%;top:45%}
+
+/* =========================
+   ABOUT
+========================= */
+
+.about{
+    min-height:90vh;
+    padding:160px 0;
+    display:flex;
+    align-items:center;
+}
+
+.about-content{
+    width:min(900px,100%);
+}
+
+.about h2{
+    font-size:clamp(48px,7vw,92px);
+    font-weight:300;
+    letter-spacing:-.07em;
+    line-height:.95;
+    margin:25px 0 40px;
+}
+
+.about p{
+    max-width:600px;
+    color:#909493;
+    font-size:18px;
+    line-height:1.65;
+}
+
+/* =========================
+   AI AGENTS
+========================= */
+
+.agents{
+    padding:150px 0;
+}
+
+.agents-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+    margin-bottom:80px;
+}
+
+.agents-heading h2{
+    margin-top:22px;
+    font-size:clamp(48px,6vw,82px);
+    font-weight:300;
+    letter-spacing:-.065em;
+}
+
+.agents-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.agent-card{
+    min-height:390px;
+    padding:28px;
+    border:1px solid var(--line2);
+    background:linear-gradient(145deg,#131516,#0c0e0f);
+    position:relative;
+    overflow:hidden;
+    transition:.5s cubic-bezier(.16,1,.3,1);
+}
+
+.agent-card:before{
+    content:"";
+    position:absolute;
+    width:250px;
+    height:250px;
+    right:-120px;
+    top:-120px;
+    background:radial-gradient(circle,rgba(255,255,255,.09),transparent 65%);
+    transition:.6s;
+}
+
+.agent-card:hover{
+    transform:translateY(-8px);
+    border-color:rgba(255,255,255,.25);
+}
+
+.agent-card:hover:before{
+    transform:scale(1.5);
+}
+
+.agent-no{
+    font-family:"DM Mono",monospace;
+    font-size:10px;
+    color:#777;
+}
+
+.agent-icon{
+    width:70px;
+    height:70px;
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    margin:55px 0 45px;
+    background:radial-gradient(circle,#3a3c3c,#121415);
+}
+
+.agent-icon:before{
+    content:"";
+    width:24px;
+    height:24px;
+    border:1px solid #ddd;
+    border-radius:7px;
+}
+
+.agent-card h3{
+    font-size:22px;
+    font-weight:400;
+    margin-bottom:12px;
+}
+
+.agent-card p{
+    color:#777b7a;
+    font-size:13px;
+    line-height:1.6;
+}
+
+/* =========================
+   WORKFLOWS
+========================= */
+
+.workflows{
+    padding:150px 0;
+}
+
+.workflow-title{
+    max-width:850px;
+    margin-bottom:80px;
+}
+
+.workflow-title h2{
+    margin-top:22px;
+    font-size:clamp(50px,7vw,92px);
+    font-weight:300;
+    letter-spacing:-.07em;
+    line-height:.95;
+}
+
+.workflow-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.workflow-card{
+    min-height:280px;
+    border:1px solid var(--line2);
+    padding:27px;
+    background:#181a1a;
+    transition:.4s ease;
+}
+
+.workflow-card:hover{
+    transform:translateY(-7px);
+    border-color:rgba(255,255,255,.22);
+}
+
+.workflow-no{
+    font-family:"DM Mono",monospace;
+    color:#777;
+    font-size:10px;
+}
+
+.workflow-card h3{
+    margin-top:55px;
+    font-size:19px;
+    font-weight:400;
+}
+
+.workflow-card p{
+    margin-top:10px;
+    color:#777;
+    font-family:"DM Mono",monospace;
+    font-size:10px;
+}
+
+.workflow-card .small-btn{
+    margin-top:32px;
+}
+
+/* =========================
+   FAQ
+========================= */
+
+.faq{
+    padding:170px 0 130px;
+    background:#181a1a;
+}
+
+.faq-grid{
+    display:grid;
+    grid-template-columns:42% 58%;
+    gap:70px;
+}
+
+.faq-left h2{
+    font-size:clamp(50px,6vw,80px);
+    font-weight:300;
+    letter-spacing:-.065em;
+    line-height:.96;
+    margin:24px 0 60px;
+}
+
+.faq-list{
+    border-top:1px solid var(--line);
+}
+
+.faq-item{
+    border-bottom:1px solid var(--line);
+}
+
+.faq-question{
+    width:100%;
+    min-height:72px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:none;
+    color:#e8e9e6;
+    border:0;
+    text-align:left;
+    cursor:pointer;
+    font-size:15px;
+}
+
+.plus{
+    font-size:27px;
+    font-weight:200;
+    transition:.35s;
+}
+
+.faq-answer{
+    max-height:0;
+    overflow:hidden;
+    color:#777b79;
+    font-size:13px;
+    line-height:1.7;
+    transition:max-height .5s ease,padding .5s ease;
+}
+
+.faq-item.open .faq-answer{
+    max-height:150px;
+    padding:0 35px 22px 0;
+}
+
+.faq-item.open .plus{
+    transform:rotate(45deg);
+}
+
+/* =========================
+   CTA
+========================= */
+
+.cta{
+    min-height:80vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:150px 0;
+}
+
+.cta h2{
+    font-size:clamp(52px,8vw,110px);
+    font-weight:300;
+    letter-spacing:-.075em;
+    line-height:.9;
+    max-width:950px;
+    margin:20px auto 40px;
+}
+
+.cta p{
+    color:#777;
+    max-width:500px;
+    margin:auto;
+    line-height:1.6;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+    border-top:1px solid var(--line2);
+    padding:35px 0;
+}
+
+.footer-inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.footer-copy{
+    font-family:"DM Mono",monospace;
+    color:#626665;
+    font-size:10px;
+}
+
+.footer-links{
+    display:flex;
+    gap:22px;
+}
+
+.footer-links a{
+    font-family:"DM Mono",monospace;
+    color:#777;
+    font-size:10px;
+    transition:.2s;
+}
+
+.footer-links a:hover{
+    color:white;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(15px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:1000;
+    opacity:0;
+    visibility:hidden;
+    transition:.35s ease;
+}
+
+.modal.show{
+    opacity:1;
+    visibility:visible;
+}
+
+.modal-box{
+    width:min(500px,100%);
+    background:#151717;
+    border:1px solid rgba(255,255,255,.18);
+    padding:35px;
+    position:relative;
+    transform:translateY(30px) scale(.97);
+    transition:.4s cubic-bezier(.16,1,.3,1);
+}
+
+.modal.show .modal-box{
+    transform:none;
+}
+
+.close-modal{
+    position:absolute;
+    right:18px;
+    top:15px;
+    border:0;
+    background:none;
+    color:#aaa;
+    font-size:25px;
+    cursor:pointer;
+}
+
+.modal-box h3{
+    font-size:34px;
+    font-weight:300;
+    letter-spacing:-.04em;
+    margin-bottom:25px;
+}
+
+.form-group{
+    margin-bottom:14px;
+}
+
+.form-group input,
+.form-group textarea{
+    width:100%;
+    background:#0b0d0d;
+    color:white;
+    border:1px solid rgba(255,255,255,.12);
+    padding:14px;
+    outline:none;
+    font-family:inherit;
+}
+
+.form-group textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+.form-submit{
+    width:100%;
+    padding:14px;
+    border:0;
+    background:#eee;
+    color:#111;
+    cursor:pointer;
+    font-weight:600;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:850px){
+
+    .nav-links{
+        display:none;
+        position:absolute;
+        top:68px;
+        left:0;
+        right:0;
+        padding:15px;
+        border:1px solid rgba(255,255,255,.15);
+        background:rgba(20,22,22,.95);
+        border-radius:25px;
+        flex-direction:column;
+        align-items:stretch;
+        gap:0;
+    }
+
+    .nav-links.open{
+        display:flex;
+    }
+
+    .nav-links a{
+        padding:14px;
+    }
+
+    .nav-links .demo-btn{
+        margin:5px 0 0;
+    }
+
+    .menu{
+        display:block;
+    }
+
+    .nav{
+        padding-right:8px;
+    }
+
+    .hero-logo{
+        width:135px;
+        height:135px;
+        transform:scale(.8);
+        margin-bottom:40px;
+    }
+
+    .hero h1{
+        font-size:48px;
+    }
+
+    .old-grid,
+    .faq-grid{
+        grid-template-columns:1fr;
+    }
+
+    .old-grid{
+        gap:50px;
+    }
+
+    .agents-grid,
+    .workflow-grid{
+        grid-template-columns:1fr;
+    }
+
+    .agents-heading{
+        display:block;
+    }
+
+    .agents-heading .small-btn{
+        margin-top:30px;
+    }
+
+    .system{
+        height:330px;
+    }
+
+    .section-title{
+        font-size:48px;
+    }
+}
+
+@media(max-width:520px){
+
+    .container{
+        width:min(100% - 28px,1160px);
+    }
+
+    .nav-wrap{
+        top:12px;
+        width:calc(100% - 20px);
+    }
+
+    .hero{
+        padding-top:110px;
+    }
+
+    .hero h1{
+        font-size:42px;
+    }
+
+    .hero-actions{
+        flex-direction:column;
+        width:180px;
+        margin:auto;
+    }
+
+    .hero-logo{
+        margin-bottom:30px;
+    }
+
+    .old-way,
+    .agents,
+    .workflows{
+        padding:110px 0;
+    }
+
+    .old-header{
+        margin-bottom:55px;
+    }
+
+    .old-header h2{
+        font-size:45px;
+    }
+
+    .problem{
+        padding:23px 18px;
+    }
+
+    .agent-card{
+        min-height:330px;
+    }
+
+    .faq{
+        padding:100px 0;
+    }
+
+    .faq-grid{
+        gap:50px;
+    }
+
+    .faq-left h2{
+        font-size:48px;
+    }
+
+    .footer-inner{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+    }
+
+    .footer-links{
+        flex-wrap:wrap;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+    <div class="loader-logo">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<div class="grid-bg"></div>
+<div class="noise"></div>
+
+<!-- NAVBAR -->
+<div class="nav-wrap">
+    <nav class="nav">
+
+        <a href="#home" class="brand">
+            <div class="brand-icon">
+                <i></i><i></i><i></i>
+                <i></i><i></i><i></i>
+            </div>
+        </a>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#about">About</a>
+            <a href="#old-way">The Old Way</a>
+            <a href="#agents">Platform</a>
+            <a href="#agents">AI Agents</a>
+            <a href="#workflows">Workflows</a>
+            <a href="#faq">FAQ</a>
+
+            <button class="demo-btn open-demo">
+                Book a Demo
+            </button>
+        </div>
+
+        <button class="menu" id="menuBtn">
+            ☰
+        </button>
+
+    </nav>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+
+    <div class="hero-inner">
+
+        <div class="hero-logo">
+
+            <div class="shape s1"></div>
+            <div class="shape s2"></div>
+            <div class="shape s3"></div>
+            <div class="shape s4"></div>
+            <div class="shape s5"></div>
+            <div class="shape s6"></div>
+
+            <div class="dot d1"></div>
+            <div class="dot d2"></div>
+            <div class="dot d3"></div>
+            <div class="dot d4"></div>
+            <div class="dot d5"></div>
+            <div class="dot d6"></div>
+
+        </div>
+
+        <div class="eyebrow reveal">
+            AI AUTOMATION PLATFORM
+        </div>
+
+        <h1 class="reveal">
+            Turn complex workflows into
+            autonomous operations.
+        </h1>
+
+        <div class="hero-actions reveal">
+
+            <button class="small-btn primary open-demo">
+                Book a Demo
+            </button>
+
+            <a href="#agents" class="small-btn">
+                Explore Platform
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- THE OLD WAY -->
+<section class="old-way" id="old-way">
+
+    <div class="container">
+
+        <div class="old-header reveal">
+
+            <div class="eyebrow">
+                THE OLD WAY
+            </div>
+
+            <h2>
+                Your team shouldn't be
+                the integration layer.
+            </h2>
+
+        </div>
+
+        <div class="old-grid">
+
+            <div class="problems">
+
+                <div class="problem active reveal">
+                    <div class="problem-number">#001</div>
+                    <h3>Manual data entry</h3>
+                    <p>Your team spends hours moving information between systems.</p>
+                </div>
+
+                <div class="problem reveal">
+                    <div class="problem-number">#002</div>
+                    <h3>Disconnected tools</h3>
+                    <p>Critical information is scattered across your entire stack.</p>
+                </div>
+
+                <div class="problem reveal">
+                    <div class="problem-number">#003</div>
+                    <h3>Repetitive decisions</h3>
+                    <p>People make the same operational decisions every day.</p>
+                </div>
+
+                <div class="problem reveal">
+                    <div class="problem-number">#004</div>
+                    <h3>Slow execution</h3>
+                    <p>Simple workflows become bottlenecks as your business grows.</p>
+                </div>
+
+            </div>
+
+            <div class="system reveal">
+
+                <div class="node node-left"></div>
+
+                <div class="system-core">
+                    <div class="core-dot"></div>
+                </div>
+
+                <div class="node node-right"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+
+    <div class="container">
+
+        <div class="about-content reveal">
+
+            <div class="eyebrow">
+                ABOUT OLIVIERA
+            </div>
+
+            <h2>
+                One automation layer
+                for your entire operation.
+            </h2>
+
+            <p>
+                Oliviera helps businesses automate repetitive work,
+                connect their tools, and build smarter workflows with AI.
+            </p>
+
+            <br>
+
+            <a href="#agents" class="small-btn">
+                Explore More
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- AI AGENTS -->
+<section class="agents" id="agents">
+
+    <div class="container">
+
+        <div class="agents-heading reveal">
+
+            <div>
+                <div class="eyebrow">
+                    AI AGENTS
+                </div>
+
+                <h2>
+                    Intelligence that
+                    works for you.
+                </h2>
+            </div>
+
+            <a href="#workflows" class="small-btn">
+                Explore More
+            </a>
+
+        </div>
+
+        <div class="agents-grid">
+
+            <article class="agent-card reveal">
+
+                <div class="agent-no">#001</div>
+
+                <div class="agent-icon"></div>
+
+                <h3>Operations Agent</h3>
+
+                <p>
+                    Handles repetitive operational tasks,
+                    routes information and keeps your systems moving.
+                </p>
+
+            </article>
+
+            <article class="agent-card reveal">
+
+                <div class="agent-no">#002</div>
+
+                <div class="agent-icon"></div>
+
+                <h3>Decision Agent</h3>
+
+                <p>
+                    Understands context, evaluates information
+                    and makes consistent operational decisions.
+                </p>
+
+            </article>
+
+            <article class="agent-card reveal">
+
+                <div class="agent-no">#003</div>
+
+                <div class="agent-icon"></div>
+
+                <h3>Integration Agent</h3>
+
+                <p>
+                    Connects your existing tools and moves
+                    information between systems automatically.
+                </p>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- WORKFLOWS -->
+<section class="workflows" id="workflows">
+
+    <div class="container">
+
+        <div class="workflow-title reveal">
+
+            <div class="eyebrow">
+                READY-TO-RUN WORKFLOWS
+            </div>
+
+            <h2>
+                Start with the workflows
+                your team already needs.
+            </h2>
+
+        </div>
+
+        <div class="workflow-grid">
+
+            <article class="workflow-card reveal">
+
+                <div class="workflow-no">
+                    #001
+                </div>
+
+                <h3>
+                    Customer Onboarding
+                </h3>
+
+                <p>
+                    CRM → AI → Documents → Access
+                </p>
+
+                <button class="small-btn template-btn">
+                    Use a Template
+                </button>
+
+            </article>
+
+            <article class="workflow-card reveal">
+
+                <div class="workflow-no">
+                    #002
+                </div>
+
+                <h3>
+                    Lead Qualification
+                </h3>
+
+                <p>
+                    Lead → AI → Qualification → Sales
+                </p>
+
+                <button class="small-btn template-btn">
+                    Use a Template
+                </button>
+
+            </article>
+
+            <article class="workflow-card reveal">
+
+                <div class="workflow-no">
+                    #003
+                </div>
+
+                <h3>
+                    Invoice Processing
+                </h3>
+
+                <p>
+                    Invoice → AI → Classification → Finance
+                </p>
+
+                <button class="small-btn template-btn">
+                    Use a Template
+                </button>
+
+            </article>
+
+            <article class="workflow-card reveal">
+
+                <div class="workflow-no">
+                    #004
+                </div>
+
+                <h3>
+                    Support Escalation
+                </h3>
+
+                <p>
+                    Ticket → AI → Classification → Team
+                </p>
+
+                <button class="small-btn template-btn">
+                    Use a Template
+                </button>
+
+            </article>
+
+            <article class="workflow-card reveal">
+
+                <div class="workflow-no">
+                    #005
+                </div>
+
+                <h3>
+                    Employee Onboarding
+                </h3>
+
+                <p>
+                    HR → AI → Documents → Access
+                </p>
+
+                <button class="small-btn template-btn">
+                    Use a Template
+                </button>
+
+            </article>
+
+            <article class="workflow-card reveal">
+
+                <div class="workflow-no">
+                    #006
+                </div>
+
+                <h3>
+                    Weekly Reporting
+                </h3>
+
+                <p>
+                    Data → AI → Analysis → Report
+                </p>
+
+                <button class="small-btn template-btn">
+                    Use a Template
+                </button>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+
+    <div class="container">
+
+        <div class="faq-grid">
+
+            <div class="faq-left reveal">
+
+                <div class="eyebrow">
+                    FAQ
+                </div>
+
+                <h2>
+                    What is AI
+                    automation?
+                </h2>
+
+                <a href="#agents" class="small-btn">
+                    Explore More
+                </a>
+
+            </div>
+
+            <div class="faq-list reveal">
+
+                <div class="faq-item">
+
+                    <button class="faq-question">
+                        <span>What is AI automation?</span>
+                        <span class="plus">+</span>
+                    </button>
+
+                    <div class="faq-answer">
+                        AI automation uses intelligent systems to
+                        perform repetitive tasks, make decisions
+                        and move information between your tools.
+                    </div>
+
+                </div>
+
+                <div class="faq-item">
+
+                    <button class="faq-question">
+                        <span>
+                            Do I need technical knowledge to use Oliviera?
+                        </span>
+                        <span class="plus">+</span>
+                    </button>
+
+                    <div class="faq-answer">
+                        No. Oliviera is designed to make automation
+                        accessible without requiring advanced technical knowledge.
+                    </div>
+
+                </div>
+
+                <div class="faq-item">
+
+                    <button class="faq-question">
+                        <span>
+                            Can Oliviera work with our existing tools?
+                        </span>
+                        <span class="plus">+</span>
+                    </button>
+
+                    <div class="faq-answer">
+                        Yes. Workflows can connect the tools and
+                        systems your team already uses.
+                    </div>
+
+                </div>
+
+                <div class="faq-item">
+
+                    <button class="faq-question">
+                        <span>
+                            Can AI agents make decisions on their own?
+                        </span>
+                        <span class="plus">+</span>
+                    </button>
+
+                    <div class="faq-answer">
+                        Agents can evaluate defined conditions,
+                        understand context and execute approved actions.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- CTA -->
+<section class="cta">
+
+    <div class="container reveal">
+
+        <div class="eyebrow">
+            AUTOMATE THE WORK
+        </div>
+
+        <h2>
+            Let your team focus
+            on what matters.
+        </h2>
+
+        <p>
+            Build autonomous workflows that keep your
+            business moving without the manual overhead.
+        </p>
+
+        <br><br>
+
+        <button class="small-btn open-demo">
+            Book a Demo
+        </button>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+
+    <div class="container">
+
+        <div class="footer-inner">
+
+            <div class="footer-copy">
+                © 2026 OLIVIERA. ALL RIGHTS RESERVED.
+            </div>
+
+            <div class="footer-links">
+                <a href="#about">ABOUT</a>
+                <a href="#agents">AI AGENTS</a>
+                <a href="#workflows">WORKFLOWS</a>
+                <a href="#faq">FAQ</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="demoModal">
+
+    <div class="modal-box">
+
+        <button class="close-modal" id="closeModal">
+            ×
+        </button>
+
+        <h3>
+            Book a Demo
+        </h3>
+
+        <form id="demoForm">
+
+            <div class="form-group">
+                <input
+                    type="text"
+                    placeholder="Your name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <input
+                    type="email"
+                    placeholder="Email address"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <textarea
+                    placeholder="Tell us about your workflow..."
+                    required
+                ></textarea>
+            </div>
+
+            <button class="form-submit">
+                REQUEST DEMO
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   LOADER
+========================= */
+
+window.addEventListener("load", () => {
+
+    setTimeout(() => {
+        document.getElementById("loader")
+            .classList.add("hide");
+    }, 900);
+
+});
+
+
+/* =========================
+   MOBILE MENU
+========================= */
+
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.getElementById("navLinks");
+
+menuBtn.addEventListener("click", () => {
+    navLinks.classList.toggle("open");
+
+    menuBtn.textContent =
+        navLinks.classList.contains("open")
+        ? "×"
+        : "☰";
+});
+
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+
+    link.addEventListener("click", () => {
+
+        navLinks.classList.remove("open");
+        menuBtn.textContent = "☰";
+
+    });
+
+});
+
+
+/* =========================
+   SCROLL REVEAL
+========================= */
+
+const revealElements =
+    document.querySelectorAll(".reveal");
+
+const revealObserver =
+    new IntersectionObserver(
+        entries => {
+
+            entries.forEach(entry => {
+
+                if(entry.isIntersecting){
+
+                    entry.target.classList.add("visible");
+
+                    revealObserver.unobserve(
+                        entry.target
+                    );
+
+                }
+
+            });
+
+        },
+        {
+            threshold:.12
+        }
+    );
+
+revealElements.forEach(el => {
+    revealObserver.observe(el);
+});
+
+
+/* =========================
+   PROBLEM CARDS
+========================= */
+
+const problems =
+    document.querySelectorAll(".problem");
+
+problems.forEach(problem => {
+
+    problem.addEventListener("click", () => {
+
+        problems.forEach(item => {
+            item.classList.remove("active");
+        });
+
+        problem.classList.add("active");
+
+    });
+
+});
+
+
+/* =========================
+   FAQ
+========================= */
+
+const faqItems =
+    document.querySelectorAll(".faq-item");
+
+faqItems.forEach(item => {
+
+    const question =
+        item.querySelector(".faq-question");
+
+    question.addEventListener("click", () => {
+
+        const wasOpen =
+            item.classList.contains("open");
+
+        faqItems.forEach(other => {
+            other.classList.remove("open");
+        });
+
+        if(!wasOpen){
+            item.classList.add("open");
+        }
+
+    });
+
+});
+
+
+/* =========================
+   DEMO MODAL
+========================= */
+
+const modal =
+    document.getElementById("demoModal");
+
+const openDemoButtons =
+    document.querySelectorAll(".open-demo");
+
+const closeModal =
+    document.getElementById("closeModal");
+
+openDemoButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        modal.classList.add("show");
+
+        document.body.style.overflow =
+            "hidden";
+
+    });
+
+});
+
+
+closeModal.addEventListener("click", closeDemo);
+
+modal.addEventListener("click", event => {
+
+    if(event.target === modal){
+        closeDemo();
+    }
+
+});
+
+
+function closeDemo(){
+
+    modal.classList.remove("show");
+
+    document.body.style.overflow = "";
+
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+document
+    .getElementById("demoForm")
+    .addEventListener("submit", event => {
+
+        event.preventDefault();
+
+        const submit =
+            event.target.querySelector(
+                ".form-submit"
+            );
+
+        submit.textContent =
+            "REQUEST SENT ✓";
+
+        submit.style.background =
+            "#b8ffcb";
+
+        setTimeout(() => {
+
+            closeDemo();
+
+            event.target.reset();
+
+            submit.textContent =
+                "REQUEST DEMO";
+
+            submit.style.background =
+                "";
+
+        },1500);
+
+    });
+
+
+/* =========================
+   TEMPLATE BUTTONS
+========================= */
+
+document
+    .querySelectorAll(".template-btn")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const oldText =
+                button.textContent;
+
+            button.textContent =
+                "ADDED ✓";
+
+            setTimeout(() => {
+                button.textContent = oldText;
+            },1200);
+
+        });
+
+    });
+
+
+/* =========================
+   MOUSE PARALLAX
+========================= */
+
+const heroLogo =
+    document.querySelector(".hero-logo");
+
+document.addEventListener("mousemove", e => {
+
+    if(window.innerWidth < 850) return;
+
+    const x =
+        (e.clientX / window.innerWidth - .5);
+
+    const y =
+        (e.clientY / window.innerHeight - .5);
+
+    heroLogo.style.transform =
+        `translate(${x * 12}px,${y * 12}px) rotate(${x * 3}deg)`;
+
+});
+
+
+/* =========================
+   ACTIVE NAV ON SCROLL
+========================= */
+
+const sections =
+    document.querySelectorAll("section[id]");
+
+const navAnchors =
+    document.querySelectorAll(".nav-links a");
+
+window.addEventListener("scroll", () => {
+
+    let current = "";
+
+    sections.forEach(section => {
+
+        const top =
+            section.offsetTop - 180;
+
+        if(window.scrollY >= top){
+            current = section.id;
+        }
+
+    });
+
+    navAnchors.forEach(anchor => {
+
+        anchor.style.opacity =
+            anchor.getAttribute("href") === "#" + current
+            ? "1"
+            : ".72";
+
+    });
+
+});
+
+
+/* =========================
+   SMOOTH BUTTON FEEDBACK
+========================= */
+
+document.querySelectorAll("a[href^='#']")
+.forEach(anchor => {
+
+    anchor.addEventListener("click", event => {
+
+        const target =
+            document.querySelector(
+                anchor.getAttribute("href")
+            );
+
+        if(target){
+
+            event.preventDefault();
+
+            target.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
+
+        }
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
